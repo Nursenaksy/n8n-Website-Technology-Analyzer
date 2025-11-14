@@ -1,0 +1,373 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc",
+          "mode": "list",
+          "cachedResultName": "Company",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sayfa1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "CMS & Content Manangement"
+            },
+            {
+              "lookupColumn": "Analysis & Tracking Tool"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "11a04696-2953-4ed1-9212-16880ebaff9f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aOOcnB5TiLU9zGBk",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c94e94e3-b6ff-4de3-b276-459b853d359d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://r.jina.ai/{{$json[\"Company Domain\"]}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer jina_8e9a95672deb4d739a8773ab841879f0nMzGotQbHtsEq7XEPgMxcsqA7hDa"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://www.example.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        96
+      ],
+      "id": "c6f6f5c9-1580-43a1-91d9-588970c6506c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Analyze the received content and identify only the technologies used by the company. Ignore all other information. Response format: Present the results as a structured list organized by categories. Each category will group similar technologies. Example classification: Hosting & Servers: [Technology names] CMS & Content Management: [Technology names] Analysis & Tracking Tools: [Technology names] Security & Performance: [Technology names] Other technologies: [Technology names] Constraints: Do not include irrelevant text (advertisements, external sources, etc.). Limit to technologies specific to the analyzed company. Provide a clear and concise response.",
+          "passthroughBinaryImages": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        832,
+        96
+      ],
+      "id": "9213fadb-82f5-4d43-96b9-bd7d718298f8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        304
+      ],
+      "id": "be6d4890-db8a-4669-a03d-078670c4b0ec",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MoZPQ5DHpXqJnlEO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"technologies\": {\n    \"Hosting & Servers\": [\n      \"Cloudflare\",\n      \"AWS CloudFront\"\n    ],\n    \"CMS & Content Management\": [\n      \"WordPress\"\n    ],\n    \"Analysis & Tracking Tools\": [\n      \"Google Analytics\",\n      \"Hotjar\"\n    ],\n    \"Security & Performance\": [\n      \"reCAPTCHA\",\n      \"SSL by Let's Encrypt\"\n    ],\n    \"Other Technologies\": [\n      \"Google Tag Manager\",\n      \"Facebook Pixel\"\n    ]\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        304
+      ],
+      "id": "8ded006a-c4a0-46b0-b394-5d287704077b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc",
+          "mode": "list",
+          "cachedResultName": "Company",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sayfa1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1di7pPpf0vp2cepj825FWxVJ3KlR5v-wKMqZJgX_iWwc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Other Teknologises": "={{ $json.output.technologies[\"Other Technologies\"] }}",
+            "Security & Performance": "={{ $json.output.technologies[\"Security & Performance\"] }}",
+            "Analysis & Tracking Tool": "={{ $json.output.technologies[\"Analysis & Tracking Tools\"] }}",
+            "CMS & Content Manangement": "={{ $json.output.technologies[\"CMS & Content Management\"] }}",
+            "Hosting & Server": "={{ $json.output.technologies[\"Hosting & Servers\"] }}",
+            "Company Domain": "={{ $('Get row(s) in sheet').item.json['Company Domain'] }}"
+          },
+          "matchingColumns": [
+            "Company Domain"
+          ],
+          "schema": [
+            {
+              "id": "Company Domain",
+              "displayName": "Company Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hosting & Server",
+              "displayName": "Hosting & Server",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Analysis & Tracking Tool",
+              "displayName": "Analysis & Tracking Tool",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Security & Performance",
+              "displayName": "Security & Performance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Other Teknologises",
+              "displayName": "Other Teknologises",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CMS & Content Manangement",
+              "displayName": "CMS & Content Manangement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1184,
+        96
+      ],
+      "id": "20ccd52e-293c-4e3b-9d44-b5a792fb67ce",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aOOcnB5TiLU9zGBk",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d7cdf765-1b9b-49e1-b889-ba66cb4a550c",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "71cf0371-1748-47bc-9cad-8d2daecca4df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "89e21a501d052b4de630815015dade9d810aebacfa6db427020a98a715dcf152"
+  },
+  "id": "rQugGwjz2fKGutbc",
+  "tags": []
+}
