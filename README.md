@@ -4,9 +4,6 @@ This project is an n8n automation workflow that uses AI (OpenAI) to automaticall
 
 It takes a list of domains as input, categorizes the technologies they use (such as CMS, hosting, analytics tools), and writes the findings into their respective columns.
 
-![Project Result Example](YOUR_IMAGE_LINK_HERE)
-*(NOTE: You can add a link to your Google Sheets screenshot here.)*
-
 ---
 
 ## 🚀 Project Goal
